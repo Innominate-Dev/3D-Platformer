@@ -29,25 +29,13 @@ public class ThirdPersonCam : MonoBehaviour
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.visible = false; //// Makes the cursor invisible to not obstruct the players view.
         combatMode = false;
     }
 
     private void Update()
     {
-        // switch camera styles
-        // if (Input.GetKeyDown(KeyCode.Mouse1) && combatMode == false)
-        // {
-        //     Debug.Log("ZOOOMMMMM");
-        //     SwitchCameraStyle(CameraStyle.Combat);
-        //     combatMode = true;
-        // }
-        // if (Input.GetKeyDown(KeyCode.Mouse1) && combatMode == true)
-        // {
-        //     Debug.Log("Zooming out");
-        //     SwitchCameraStyle(CameraStyle.Basic);
-        //     combatMode = false;
-        // }
+        //////////////////////// SWITCHES CAMERA MODES ////////////////////////
         if (Input.GetKeyDown(KeyCode.Mouse1) && combatMode == false)
         {
             Debug.Log("Moving to combat!");
@@ -57,16 +45,16 @@ public class ThirdPersonCam : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1) && combatMode == true)
         {
             Debug.Log("Moving to basic");
-            SwitchCameraStyle(CameraStyle.Basic);
-            StartCoroutine(BasicModeActive());
+            SwitchCameraStyle(CameraStyle.Basic); // THIS CALLS ANOTHER METHOD AND SWITCHES BETWEEN THE TWO CAMERA IN THE SCENE NAMED COMBAT AND BASIC
+            StartCoroutine(BasicModeActive());// THIS CALLS THE METHOD/ENUMERATOR AND ASKS FOR INSTRUCTIONS. IT THEN WAITS 5 SECONDS THEN CHANGES THE BOOL TO FALSE AS THE PLAYER SWITCHES TO BASIC MODE
         }
 
-        // rotate orientation
+        ///////////////////////// ROTATATION ORIENTATION ///////////////////////////////////
         Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
         orientation.forward = viewDir.normalized;
 
-        // roate player object
-        if(currentStyle == CameraStyle.Basic)
+        //////////////////////////////////////// ROTATES PLAYER OBJECT /////////////////////////////
+        if(currentStyle == CameraStyle.Basic) /// This code rotates the player object to follow the players mouse
         {
             float horizontalInput = Input.GetAxis("Horizontal");
             float verticalInput = Input.GetAxis("Vertical");
@@ -85,9 +73,9 @@ public class ThirdPersonCam : MonoBehaviour
         }
     }
 
-    IEnumerator CombatModeActive()
-    {
-        print(Time.time);
+    IEnumerator CombatModeActive() /////// THIS Enumerator IS LIKE A METHOD THAT ALLOWS ME TO DELAY THE FUNCTION WHEN THE PLAYER CALLS IT IN VOID UPDATE. So the function of what it is, in this case 
+    {                     /////  it switch camera modes. To prevent any code breaking I put waitforseconds to delay the combat mode status so the player can't spam it
+        print(Time.time); ///// It also prevents the camera just infinitely staying in basic mode as it was doing before
         yield return new WaitForSeconds(5);
         combatMode = true;
         print("Combat Mode activated");
@@ -101,7 +89,9 @@ public class ThirdPersonCam : MonoBehaviour
         print("Switching to Basic mode");
     }
 
-    private void SwitchCameraStyle(CameraStyle newStyle)
+    /////////////////// SWITCH CAMERA STYLE /////////////////////////
+
+    private void SwitchCameraStyle(CameraStyle newStyle) //// THIS IS A PRIVATE METHOD JUST TO SMOOTHLY TRANSITION THE CAMERAS
     {
         combatCam.SetActive(false);
         thirdPersonCam.SetActive(false);

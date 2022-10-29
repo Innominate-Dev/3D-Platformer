@@ -4,15 +4,34 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    //////////////// VARIABLES ////////////////
+    
     [Header("Movement")]
     public float moveSpeed; //////////////// GENERAL SPEED FOR PLAYER ////////////////////
+    public float walkSpeed;
+    public float sprintSpeed;
+    public float WallRunSpeed;
 
     public float groundDrag;
+
+    public float jumpForce;
+    public float jumpCoolDown;
+    public float airMultiplier;
+    bool readyToJump = true;
+
+    public float wallRunSpeed;
+
+    ///////// KEYBINDS /////////
+
+    [Header("Keybinds")]
+    public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode sprintKey = KeyCode.LeftShift;
+
 
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask WhatIsGround;
-    bool isGrounded;
+    public bool isGrounded;
 
     [Header("Movement")]
 
@@ -24,6 +43,24 @@ public class PlayerController : MonoBehaviour
     Vector3 moveDirection; ///////// DIRECTION THE PLAYER MOVES IN
 
     Rigidbody rb; /// PLAYER RIGID BODY
+
+
+    /////////////////// MOVEMENT STATE ///////////////////
+
+
+    public MovementState state;
+
+    public enum MovementState
+    {
+        walking,
+        sprinting,
+        air,
+        WallRunning
+    }
+
+    public bool WallRunning;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -39,7 +76,9 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, WhatIsGround);
 
         PlayerInput(); /////////// THIS IS TO CONSTANTLY CHECK ON THE PLAYER IF THEY PRESS DOWN A MOVEMENT KEY AND It is called every frame
-        
+        SpeedControl();
+        StateHandler();
+
         // handle drag
         if(isGrounded)
         {
@@ -59,8 +98,48 @@ public class PlayerController : MonoBehaviour
     /////////////// PLAYER INPUT METHOD ///////////////////////
     void PlayerInput()
     {
+        /////////////// MOVEMENT SYSTEM //////////////////
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+
+        ////////////////// JUMP SYSTEM ///////////////////
+
+        if(Input.GetKeyDown(jumpKey) && readyToJump == true && isGrounded == true) /// This checks if the player pressed space or what ever keybind they selected to jump
+        {
+            Debug.Log("Jumping");
+            readyToJump = false; //Changes the bool status to false so the player can't spam 
+            Jump(); // Calls the method
+
+            Invoke(nameof(ResetJump), jumpCoolDown); // Calls the function Reset Jump and calls the variable JumpCoolDown.
+        }
+    }
+
+    private void StateHandler()
+    {
+
+
+        // MODE - SPRINTING
+        if(isGrounded && Input.GetKey(sprintKey))
+        {
+            state = MovementState.sprinting;
+            moveSpeed = sprintSpeed;
+        }
+        else if (isGrounded)
+        {
+            state = MovementState.walking;
+            moveSpeed = walkSpeed;
+        }
+        // Mode - Wallrunning
+        else if(WallRunning)
+        {
+            state = MovementState.WallRunning;
+            moveSpeed = wallRunSpeed;
+        }
+        else 
+        {
+            state = MovementState.air;
+        }
+
     }
 
     private void MovePlayer()
@@ -68,9 +147,38 @@ public class PlayerController : MonoBehaviour
         // CALCULATES THE MOVEMENT DIRECTION
 
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        //WHEN ON THE GROUND
+        if(isGrounded)
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed* 10f, ForceMode.Force); //// THIS ADDS FORCE TO THE RIGID BODY AND MAKES THE PLAYER MOVE IN THE DIRECTION PRESSED IN
+        }
 
-        rb.AddForce(moveDirection.normalized * moveSpeed* 10f, ForceMode.Force); //// THIS ADDS FORCE TO THE RIGID BODY AND MAKES THE PLAYER MOVE IN THE DIRECTION PRESSED IN
+        else if(!isGrounded)
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force); // IF THE PLAYER IS IN THE AIR AND NOT TOUCHING THE GROUND
+        }
     }
     
+    private void SpeedControl()
+    {
+        Vector3 flatvel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        if(flatvel.magnitude > moveSpeed)
+        {
+            Vector3 limitedVel = flatvel.normalized * moveSpeed;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+        }
+    }
 
+    private void Jump()
+    {
+        ///////// RESET Y VELOCITY /////////////////
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    private void ResetJump()
+    {
+        readyToJump = true;
+    }
 }

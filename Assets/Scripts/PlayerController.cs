@@ -88,6 +88,11 @@ public class PlayerController : MonoBehaviour
         {
             rb.drag = 0f;
         }
+
+        if( WallRunning == false)
+        {
+            rb.useGravity = true;
+        }
     }
 
     private void FixedUpdate() //// THIS METHOD IS BEING USED FOR THE PHYSICS CALCULATIONS SINCE FIXEDUPDATE CAN RUN SEVERAL TIMES In one frame.

@@ -53,8 +53,11 @@ public class WallRunning : MonoBehaviour
 
     private void CheckForWall()
     {
-        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallhit, wallCheckDistance, whatIsWall);
+        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallhit, wallCheckDistance, whatIsWall); //Invisible ray to check if there is a wall
         wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallhit, wallCheckDistance, whatIsWall);
+
+        Debug.DrawLine(transform.position, transform.position + (orientation.right * wallCheckDistance), Color.green);
+        Debug.DrawLine(transform.position, transform.position - (orientation.right * wallCheckDistance), Color.blue);
     }
 
     private bool AboveGround()
@@ -79,17 +82,15 @@ public class WallRunning : MonoBehaviour
                 StartWallRun();
             }
             else
-            {
-                if(pc.WallRunning)
-                {
-                    StopWallRun();
-                }
+            {  
+                StopWallRun(); 
             }
         }
     }
 
     private void StartWallRun()
     {
+        Debug.Log("Beginning Wall RUN!");
         pc.WallRunning = true;
     }
 
@@ -98,21 +99,24 @@ public class WallRunning : MonoBehaviour
         rb.useGravity = false;
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal;
+        Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal; //Cheap way of doing a if statement e.g if WallRight is true make right wall hit.normal true
 
-        Vector3 wallForward = Vector3.Cross(wallNormal, transform.up);
+        Vector3 wallForward = Vector3.Cross(wallNormal, transform.up); //Makes you go automatically forward
 
         ////////////// FORWARD FORCE ////////////
         if((orientation.forward - wallForward).magnitude > (orientation.forward - -wallForward).magnitude)
         {
             wallForward = -wallForward;
+            Debug.Log("MOVING FORWARDS!");
+
         }
 
-        rb.AddForce(wallForward * wallRunForce, ForceMode.Force);
+        rb.AddForce(wallForward * wallRunForce, ForceMode.Force); // This adds a force to bring the player closer
 
         if(!(wallLeft && horizontalInput > 0) && !(wallRight && horizontalInput < 0))
         {
-            rb.AddForce(-wallNormal * 100, ForceMode.Force);
+            rb.AddForce(-wallNormal * 100, ForceMode.Force); // This adds a force that 
+            Debug.Log("MAKING YOU STICK TO THE SIDE");
         }
     }
 

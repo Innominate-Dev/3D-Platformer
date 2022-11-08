@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed; //////////////// GENERAL SPEED FOR PLAYER ////////////////////
     public float walkSpeed;
     public float sprintSpeed;
-    public float WallRunSpeed;
 
     public float groundDrag;
 

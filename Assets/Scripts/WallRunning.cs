@@ -8,6 +8,8 @@ public class WallRunning : MonoBehaviour
 
     public LayerMask whatIsWall;
     public LayerMask whatIsGround;
+    public float wallJumpUpForce;
+    public float wallJumpSideForce;
     public float wallRunForce;
     public float MaxWallRunTime;
 
@@ -16,6 +18,8 @@ public class WallRunning : MonoBehaviour
     [Header("Input")]
     private float horizontalInput;
     private float verticalInput;
+    public KeyCode jumpKey = KeyCode.Space;
+
 
     [Header("Detection")]
     public float wallCheckDistance;
@@ -25,6 +29,11 @@ public class WallRunning : MonoBehaviour
     private RaycastHit rightWallhit;
     private bool wallLeft;
     private bool wallRight;
+
+    [Header("Exiting")]
+    private bool exitingWall;
+    public float exitWallTime;
+    private float exitWallTimer;
 
     [Header("References")]
     public Transform orientation;
@@ -74,16 +83,45 @@ public class WallRunning : MonoBehaviour
 
         // Phase 1 - Wall running
 
-        if((wallLeft || wallRight) && verticalInput > 0 && AboveGround())
+        if((wallLeft || wallRight) && verticalInput > 0 && AboveGround() && !exitingWall)
         {
             /////////////// WALL RUNNING ///////////////
             if(!pc.WallRunning)
             {
-                StartWallRun();
+                if(!pc.WallRunning)
+                {
+                    StartWallRun();
+                }
+
+                if(Input.GetKeyDown(jumpKey)) WallJump();
             }
+
+            //Phase 2 - Jumping from wall state
+            else if(exitingWall == true)
+            {
+                if(pc.WallRunning)
+                {
+                    StopWallRun();
+                }
+
+                if(exitWallTimer > 0)
+                {
+                    exitWallTimer -= Time.deltaTime;
+                }
+
+                if(exitWallTimer <= 0)
+                {
+                    exitingWall = false;
+                    Debug.Log("Wall is false");
+                }
+            }
+
             else
             {  
-                StopWallRun(); 
+                if(pc.WallRunning)
+                {
+                    StopWallRun();
+                }
             }
         }
     }
@@ -124,5 +162,19 @@ public class WallRunning : MonoBehaviour
     {
         Debug.Log("Stopping Run");
         pc.WallRunning = false;
+    }
+
+    private void WallJump()
+    {
+        // Entering wall state
+        exitingWall = true;
+        exitWallTimer = exitWallTime;
+        Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal;
+
+        Vector3 forceToApply = transform.up * wallJumpUpForce + wallNormal * wallJumpSideForce;
+
+        // reset y velocity and add force to the player so they can jump
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        rb.AddForce(forceToApply, ForceMode.Impulse);
     }
 }

@@ -20,6 +20,8 @@ public class ThirdPersonCam : MonoBehaviour
     public GameObject combatCam;
 
     public CameraStyle currentStyle;
+
+    public float CameraSpeed;
     public enum CameraStyle
     {
         Basic,
@@ -61,7 +63,7 @@ public class ThirdPersonCam : MonoBehaviour
             Vector3 inputDir = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
             if (inputDir != Vector3.zero)
-                playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, Time.deltaTime * rotationSpeed);
+                playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, CameraSpeed * rotationSpeed);
         }
 
         else if(currentStyle == CameraStyle.Combat)
@@ -76,7 +78,7 @@ public class ThirdPersonCam : MonoBehaviour
     IEnumerator CombatModeActive() /////// THIS Enumerator IS LIKE A METHOD THAT ALLOWS ME TO DELAY THE FUNCTION WHEN THE PLAYER CALLS IT IN VOID UPDATE. So the function of what it is, in this case 
     {                     /////  it switch camera modes. To prevent any code breaking I put waitforseconds to delay the combat mode status so the player can't spam it
         print(Time.time); ///// It also prevents the camera just infinitely staying in basic mode as it was doing before
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(1);
         combatMode = true;
         print("Combat Mode activated");
     }
@@ -84,7 +86,7 @@ public class ThirdPersonCam : MonoBehaviour
     IEnumerator BasicModeActive()
     {
         print(Time.time);
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(1);
         combatMode = false;
         print("Switching to Basic mode");
     }

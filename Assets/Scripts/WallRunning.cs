@@ -5,35 +5,28 @@ using UnityEngine;
 public class WallRunning : MonoBehaviour
 {
     [Header("Wall Running")]
-
     public LayerMask whatIsWall;
     public LayerMask whatIsGround;
-    public float wallJumpUpForce;
-    public float wallJumpSideForce;
     public float wallRunForce;
-    public float MaxWallRunTime;
-
-    private float wallRunTimer;
+    public float wallClimbSpeed;
+    public float maxWallRunTime;
+    private float wallRunTimer; 
 
     [Header("Input")]
+    public KeyCode upwardsRunKey = KeyCode.LeftShift; // For the player to climb up or down
+    public KeyCode downwardsRunKey = KeyCode.LeftControl;
+    private bool upwardsRunning;
+    private bool downwardsRunning;
     private float horizontalInput;
     private float verticalInput;
-    public KeyCode jumpKey = KeyCode.Space;
-
 
     [Header("Detection")]
     public float wallCheckDistance;
     public float minJumpHeight;
-
     private RaycastHit leftWallhit;
     private RaycastHit rightWallhit;
     private bool wallLeft;
     private bool wallRight;
-
-    [Header("Exiting")]
-    private bool exitingWall;
-    public float exitWallTime;
-    private float exitWallTimer;
 
     [Header("References")]
     public Transform orientation;
@@ -48,87 +41,53 @@ public class WallRunning : MonoBehaviour
 
     private void Update()
     {
-        CheckForWall();
+        CheckForWall(); // Repeatedly calls the both of these methods to always check
         StateMachine();
     }
 
     private void FixedUpdate()
     {
-        if(pc.WallRunning)
-        {
-            WallRunningMovement();
-        }
+        if (pc.WallRunning)
+            WallRunningMovement(); // Constantly runs this since this is a physics calculation
     }
 
     private void CheckForWall()
     {
-        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallhit, wallCheckDistance, whatIsWall); //Invisible ray to check if there is a wall
+        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallhit, wallCheckDistance, whatIsWall);
         wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallhit, wallCheckDistance, whatIsWall);
-
-        Debug.DrawLine(transform.position, transform.position + (orientation.right * wallCheckDistance), Color.green);
-        Debug.DrawLine(transform.position, transform.position - (orientation.right * wallCheckDistance), Color.blue);
     }
 
     private bool AboveGround()
     {
-        return !Physics.Raycast(transform.position, Vector3.down, minJumpHeight, whatIsGround); // If the player is high enough to do a wall run
+        return !Physics.Raycast(transform.position, Vector3.down, minJumpHeight, whatIsGround);
     }
 
     private void StateMachine()
     {
-        ///////// INPUT FROM THE PLAYER //////////////
-
+        ////////// GETS PLAYER INPUT //////////////
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
-        // Phase 1 - Wall running
+        upwardsRunning = Input.GetKey(upwardsRunKey);
+        downwardsRunning = Input.GetKey(downwardsRunKey); //// To make the player go up or down the wall at the moment is Left Shift and Lft Ctrl
 
-        if((wallLeft || wallRight) && verticalInput > 0 && AboveGround() && !exitingWall)
+        // Phase 1 - Checks if we are wall running
+        if ((wallLeft || wallRight) && verticalInput > 0 && AboveGround())
         {
-            /////////////// WALL RUNNING ///////////////
-            if(!pc.WallRunning)
-            {
-                if(!pc.WallRunning)
-                {
-                    StartWallRun();
-                }
+            if (!pc.WallRunning)
+                StartWallRun();
+        }
 
-                if(Input.GetKeyDown(jumpKey)) WallJump();
-            }
-
-            //Phase 2 - Jumping from wall state
-            else if(exitingWall == true)
-            {
-                if(pc.WallRunning)
-                {
-                    StopWallRun();
-                }
-
-                if(exitWallTimer > 0)
-                {
-                    exitWallTimer -= Time.deltaTime;
-                }
-
-                if(exitWallTimer <= 0)
-                {
-                    exitingWall = false;
-                    Debug.Log("Wall is false");
-                }
-            }
-
-            else
-            {  
-                if(pc.WallRunning)
-                {
-                    StopWallRun();
-                }
-            }
+        // Phase 3 - Checks if we are on the wall
+        else
+        {
+            if (pc.WallRunning)
+                StopWallRun();
         }
     }
 
     private void StartWallRun()
     {
-        Debug.Log("Beginning Wall RUN!");
         pc.WallRunning = true;
     }
 
@@ -137,44 +96,29 @@ public class WallRunning : MonoBehaviour
         rb.useGravity = false;
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal; //Cheap way of doing a if statement e.g if WallRight is true make right wall hit.normal true
+        Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal;
 
-        Vector3 wallForward = Vector3.Cross(wallNormal, transform.up); //Makes you go automatically forward
+        Vector3 wallForward = Vector3.Cross(wallNormal, transform.up);
 
-        ////////////// FORWARD FORCE ////////////
-        if((orientation.forward - wallForward).magnitude > (orientation.forward - -wallForward).magnitude)
-        {
+        if ((orientation.forward - wallForward).magnitude > (orientation.forward - -wallForward).magnitude)
             wallForward = -wallForward;
-            Debug.Log("MOVING FORWARDS!");
 
-        }
+        /////////////// THIS MAKES THE PLAYER ONLY GO FORWARD /////////////////
+        rb.AddForce(wallForward * wallRunForce, ForceMode.Force);
 
-        rb.AddForce(wallForward * wallRunForce, ForceMode.Force); // This adds a force to bring the player closer
+        ///////////////////// Makes the player go up the wall /////////////////////////
+        if (upwardsRunning)
+            rb.velocity = new Vector3(rb.velocity.x, wallClimbSpeed, rb.velocity.z);
+        if (downwardsRunning)
+            rb.velocity = new Vector3(rb.velocity.x, -wallClimbSpeed, rb.velocity.z);
 
-        if(!(wallLeft && horizontalInput > 0) && !(wallRight && horizontalInput < 0))
-        {
-            rb.AddForce(-wallNormal * 100, ForceMode.Force); // This adds a force that 
-            Debug.Log("MAKING YOU STICK TO THE SIDE");
-        }
+        ///////////////// THIS PUSHES THE PLAYER TOWARDS THE WALL /////////////////
+        if (!(wallLeft && horizontalInput > 0) && !(wallRight && horizontalInput < 0))
+            rb.AddForce(-wallNormal * 100, ForceMode.Force);
     }
 
     private void StopWallRun()
     {
-        Debug.Log("Stopping Run");
         pc.WallRunning = false;
-    }
-
-    private void WallJump()
-    {
-        // Entering wall state
-        exitingWall = true;
-        exitWallTimer = exitWallTime;
-        Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal;
-
-        Vector3 forceToApply = transform.up * wallJumpUpForce + wallNormal * wallJumpSideForce;
-
-        // reset y velocity and add force to the player so they can jump
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-        rb.AddForce(forceToApply, ForceMode.Impulse);
     }
 }

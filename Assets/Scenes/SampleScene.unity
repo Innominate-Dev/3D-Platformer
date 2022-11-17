@@ -2652,7 +2652,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 727804156}
-  m_LocalRotation: {x: 0.070889026, y: -0.00000001664324, z: 0.0000000011827987, w: 0.9974842}
+  m_LocalRotation: {x: 0.07088901, y: 0.000000018227158, z: -0.0000000012953639, w: 0.9974842}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -6397,14 +6397,13 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 256
-  wallJumpUpForce: 7
-  wallJumpSideForce: 12
   wallRunForce: 200
-  MaxWallRunTime: 1.5
-  jumpKey: 32
+  wallClimbSpeed: 3
+  maxWallRunTime: 1.5
+  upwardsRunKey: 304
+  downwardsRunKey: 306
   wallCheckDistance: 0.7
   minJumpHeight: 2
-  exitWallTime: 1
   orientation: {fileID: 1454096377}
 --- !u!1 &1743240495
 GameObject:

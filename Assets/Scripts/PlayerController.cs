@@ -134,12 +134,12 @@ public class PlayerController : MonoBehaviour
             moveSpeed = walkSpeed;
         }
         // Mode - Wallrunning
-        else if(WallRunning)
+        else if(WallRunning == true)
         {
             state = MovementState.WallRunning;
             moveSpeed = wallRunSpeed;
         }
-        else 
+        else if (!WallRunning)
         {
             state = MovementState.air;
         }

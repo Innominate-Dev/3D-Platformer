@@ -78,7 +78,7 @@ public class WallRunning : MonoBehaviour
                 StartWallRun();
         }
 
-        // Phase 3 - Checks if we are on the wall
+        // Phase 3 - Checks if we are on the wall if not then it will stop
         else
         {
             if (pc.WallRunning)

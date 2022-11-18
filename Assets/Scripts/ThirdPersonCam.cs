@@ -78,7 +78,7 @@ public class ThirdPersonCam : MonoBehaviour
     IEnumerator CombatModeActive() /////// THIS Enumerator IS LIKE A METHOD THAT ALLOWS ME TO DELAY THE FUNCTION WHEN THE PLAYER CALLS IT IN VOID UPDATE. So the function of what it is, in this case 
     {                     /////  it switch camera modes. To prevent any code breaking I put waitforseconds to delay the combat mode status so the player can't spam it
         print(Time.time); ///// It also prevents the camera just infinitely staying in basic mode as it was doing before
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         combatMode = true;
         print("Combat Mode activated");
     }
@@ -86,7 +86,7 @@ public class ThirdPersonCam : MonoBehaviour
     IEnumerator BasicModeActive()
     {
         print(Time.time);
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         combatMode = false;
         print("Switching to Basic mode");
     }

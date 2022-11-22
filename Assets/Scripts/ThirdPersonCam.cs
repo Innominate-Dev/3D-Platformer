@@ -18,6 +18,7 @@ public class ThirdPersonCam : MonoBehaviour
 
     public GameObject thirdPersonCam;
     public GameObject combatCam;
+    public GameObject crosshair;
 
     public CameraStyle currentStyle;
 
@@ -33,6 +34,8 @@ public class ThirdPersonCam : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false; //// Makes the cursor invisible to not obstruct the players view.
         combatMode = false;
+        crosshair.SetActive(false);
+
     }
 
     private void Update()
@@ -64,6 +67,8 @@ public class ThirdPersonCam : MonoBehaviour
 
             if (inputDir != Vector3.zero)
                 playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, CameraSpeed * rotationSpeed);
+
+            crosshair.SetActive(false);
         }
 
         else if(currentStyle == CameraStyle.Combat)
@@ -72,6 +77,8 @@ public class ThirdPersonCam : MonoBehaviour
             orientation.forward = dirToCombatLookAt.normalized;
 
             playerObj.forward = dirToCombatLookAt.normalized;
+
+            crosshair.SetActive(true);
         }
     }
 

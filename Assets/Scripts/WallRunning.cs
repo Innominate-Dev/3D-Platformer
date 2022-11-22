@@ -8,6 +8,8 @@ public class WallRunning : MonoBehaviour
     public LayerMask whatIsWall;
     public LayerMask whatIsGround;
     public float wallRunForce;
+    public float wallJumpUpForce;
+    public float wallJumpSideForce;
     public float wallClimbSpeed;
     public float maxWallRunTime;
     private float wallRunTimer; 
@@ -15,6 +17,7 @@ public class WallRunning : MonoBehaviour
     [Header("Input")]
     public KeyCode upwardsRunKey = KeyCode.LeftShift; // For the player to climb up or down
     public KeyCode downwardsRunKey = KeyCode.LeftControl;
+    public KeyCode jumpKey = KeyCode.Space;
     private bool upwardsRunning;
     private bool downwardsRunning;
     private float horizontalInput;
@@ -27,6 +30,11 @@ public class WallRunning : MonoBehaviour
     private RaycastHit rightWallhit;
     private bool wallLeft;
     private bool wallRight;
+
+    [Header("Exiting")]
+    public bool exitingWall;
+    private float exitWallTimer;
+    public float exitWallTime;
 
     [Header("References")]
     public Transform orientation;
@@ -72,10 +80,30 @@ public class WallRunning : MonoBehaviour
         downwardsRunning = Input.GetKey(downwardsRunKey); //// To make the player go up or down the wall at the moment is Left Shift and Lft Ctrl
 
         // Phase 1 - Checks if we are wall running
-        if ((wallLeft || wallRight) && verticalInput > 0 && AboveGround())
+        if ((wallLeft || wallRight) && verticalInput > 0 && AboveGround() && !exitingWall)
         {
             if (!pc.WallRunning)
                 StartWallRun();
+            
+            if(Input.GetKeyDown(jumpKey)) WallJump(); //If the player presses space then they will wall jump, it requests the method.
+        }
+        
+        else if(exitingWall)
+        {
+            if(pc.WallRunning)
+            {
+                StopWallRun();
+            }
+
+            if(exitWallTimer > 0)
+            {
+                exitWallTimer -= Time.deltaTime;
+            }
+
+            if(exitWallTimer <= 0)
+            {
+                exitingWall = false;
+            }
         }
 
         // Phase 3 - Checks if we are on the wall if not then it will stop
@@ -120,5 +148,19 @@ public class WallRunning : MonoBehaviour
     private void StopWallRun()
     {
         pc.WallRunning = false;
+    }
+
+    private void WallJump()
+    {
+        exitingWall = true;
+        exitWallTimer = exitWallTime;
+
+        Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal;
+
+        Vector3 forceToApply = transform.up * wallJumpUpForce + wallNormal * wallJumpSideForce;
+
+        //////////// Jumping [Adding force] //////////
+        rb.velocity = new Vector3(rb.velocity.x, 0f,rb.velocity.z); /// THIS RESETS THE Y VELOCITY SO the player doesn't go flying off the wall
+        rb.AddForce(forceToApply, ForceMode.Impulse); // Creates a impulse/outburst of force for the player to jump off the wall
     }
 }

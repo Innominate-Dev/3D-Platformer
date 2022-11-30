@@ -9,7 +9,13 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: ea15162eafae6c54db9db90a52acfbfe
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/Credits.unity
+    guid: 2578033f9f6c6074d848e08d95113a7c
+  - enabled: 1
+    path: Assets/Scenes/Settings.unity
+    guid: 2ad55a8db941e5141a95019ec6ebba49
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
     path: Assets/Scenes/DeathScreen.unity

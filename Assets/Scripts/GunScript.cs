@@ -8,6 +8,7 @@ public class GunScript : MonoBehaviour
     public GameObject bulletPrefab;
     public GameObject gun;
     public Camera Cam;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -17,8 +18,6 @@ public class GunScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //horizontalInput = Input.GetAxisRaw("Horizontal");
-        //moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         if (Input.GetMouseButtonDown(0))
         {

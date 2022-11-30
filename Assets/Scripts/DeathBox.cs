@@ -8,7 +8,7 @@ public class DeathBox : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(2);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(4);
         }
     }
 }

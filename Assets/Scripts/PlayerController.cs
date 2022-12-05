@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
     Vector3 moveDirection; ///////// DIRECTION THE PLAYER MOVES IN
 
     Rigidbody rb; /// PLAYER RIGID BODY
-
+    Animator myAnim;
 
     /////////////////// MOVEMENT STATE ///////////////////
 
@@ -64,6 +64,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        myAnim = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
     }
@@ -77,6 +78,9 @@ public class PlayerController : MonoBehaviour
         PlayerInput(); /////////// THIS IS TO CONSTANTLY CHECK ON THE PLAYER IF THEY PRESS DOWN A MOVEMENT KEY AND It is called every frame
         SpeedControl();
         StateHandler();
+
+        myAnim.SetFloat("speed", moveDirection.magnitude);
+        Debug.Log(moveDirection.magnitude);
 
         // handle drag
         if(isGrounded)

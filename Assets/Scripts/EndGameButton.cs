@@ -22,7 +22,7 @@ public class EndGameButton : MonoBehaviour
         {
             if(Input.GetKeyDown(KeyCode.E))
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Main Menu");
             }
         }
     }

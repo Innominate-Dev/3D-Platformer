@@ -29,10 +29,21 @@ public class ThirdPersonCam : MonoBehaviour
         Combat
     }
 
+    private PauseGame PG;
+
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false; //// Makes the cursor invisible to not obstruct the players view.
+        PG = GetComponent<PauseGame>();
+        if (PG.GameIsPaused == true)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else if (PG.GameIsPaused == false)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false; //// Makes the cursor invisible to not obstruct the players view.
+        }
         combatMode = false;
         crosshair.SetActive(false);
 

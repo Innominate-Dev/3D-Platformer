@@ -35,7 +35,9 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
 
     public Transform orientation; /////////////////// MOVE THE PLAYERS ORIENTATION ///////////////////
+    public Transform Player;
 
+    float PlayerRotating;
     float horizontalInput; //////////////////// MOVEMENT OVERALL ////////////////
     float verticalInput; ////////////////////// HEIGHT OF JUMP //////////////////
 
@@ -188,5 +190,13 @@ public class PlayerController : MonoBehaviour
     private void ResetJump()
     {
         readyToJump = true;
+    }
+
+    private void TiltWallRun()
+    {
+        if (WallRunning == true)
+        {
+            PlayerRotating = Player.rotation.z;
+        }
     }
 }

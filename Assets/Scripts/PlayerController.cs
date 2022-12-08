@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
     public Transform orientation; /////////////////// MOVE THE PLAYERS ORIENTATION ///////////////////
     public Transform Player;
 
-    float PlayerRotating;
+    float playerrot; /// Player Rotation
     float horizontalInput; //////////////////// MOVEMENT OVERALL ////////////////
     float verticalInput; ////////////////////// HEIGHT OF JUMP //////////////////
 
@@ -80,6 +80,15 @@ public class PlayerController : MonoBehaviour
         PlayerInput(); /////////// THIS IS TO CONSTANTLY CHECK ON THE PLAYER IF THEY PRESS DOWN A MOVEMENT KEY AND It is called every frame
         SpeedControl();
         StateHandler();
+        //TiltWallRun();
+
+        ////// Tilting the player if they wall run /////////////
+
+        playerrot = Player.rotation.z;
+        playerrot = 45f;
+
+
+        ///// Getting the magnitude of the player for the animation /////////
 
         myAnim.SetFloat("speed", moveDirection.magnitude);
         Debug.Log(moveDirection.magnitude);
@@ -196,7 +205,8 @@ public class PlayerController : MonoBehaviour
     {
         if (WallRunning == true)
         {
-            PlayerRotating = Player.rotation.z;
+            Player.transform.rotation = Quaternion.Euler(new Vector3(playerrot, Player.transform.rotation.eulerAngles.y, Player.transform.rotation.eulerAngles.y));
         }
+        
     }
 }

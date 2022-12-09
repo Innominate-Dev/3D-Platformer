@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
 
     public int score;
 
+    private ScoreManager theScoreManager;
+
     private void Awake()
     {
         // If there is an instance, and it's not me, delete myself.
@@ -26,5 +28,6 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(gameObject);
+        theScoreManager = FindObjectOfType<ScoreManager>();
     }
 }

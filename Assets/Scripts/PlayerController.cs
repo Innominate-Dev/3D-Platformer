@@ -142,11 +142,13 @@ public class PlayerController : MonoBehaviour
         {
             state = MovementState.sprinting;
             moveSpeed = sprintSpeed;
+            myAnim.SetBool("Running", true);
         }
         else if (isGrounded)
         {
             state = MovementState.walking;
             moveSpeed = walkSpeed;
+            myAnim.SetBool("Running", false);
         }
         // Mode - Wallrunning
         else if(WallRunning == true)
@@ -157,6 +159,7 @@ public class PlayerController : MonoBehaviour
         else if (!WallRunning)
         {
             state = MovementState.air;
+            myAnim.SetBool("Running", false);
         }
 
     }

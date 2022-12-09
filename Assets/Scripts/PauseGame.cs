@@ -8,27 +8,32 @@ public class PauseGame : MonoBehaviour
     public GameObject pauseMenuUI;
 
 
+    public void pause_system()
+    {
+        if (Time.timeScale == 0)
+        {
+            pauseMenuUI.SetActive(false);
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            Time.timeScale = 1;
+            GameIsPaused = false;
+        }
+        else
+        {
+            GameIsPaused = true;
+            Time.timeScale = 0;
+            pauseMenuUI.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (Time.timeScale == 0)
-            {
-                pauseMenuUI.SetActive(false);
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
-                Time.timeScale = 1;
-                GameIsPaused = false;
-            }
-            else
-            {
-                GameIsPaused = true;
-                Time.timeScale = 0;
-                pauseMenuUI.SetActive(true);
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
+            pause_system();
         }
     }
 }

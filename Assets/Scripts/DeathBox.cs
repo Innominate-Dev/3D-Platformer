@@ -9,6 +9,7 @@ public class DeathBox : MonoBehaviour
         if (other.tag == "Player")
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene(4);
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 }

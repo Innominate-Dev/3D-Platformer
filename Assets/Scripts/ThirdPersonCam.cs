@@ -34,6 +34,7 @@ public class ThirdPersonCam : MonoBehaviour
     private void Start()
     {
         PG = GetComponent<PauseGame>();
+        Cursor.lockState = CursorLockMode.Locked;
         if (PG.GameIsPaused == true)
         {
             Cursor.lockState = CursorLockMode.None;
